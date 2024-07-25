@@ -1,0 +1,171 @@
+1.
+
+CREATE DATABASE LibraryManagement;
+
+create table authors(
+	author_id INT auto_increment primary key,
+    author_name VARCHAR(50)
+);
+
+create table genres(
+	genre_id INT auto_increment primary key,
+    genre_name VARCHAR(50)
+);
+
+create table books(
+	book_id INT auto_increment primary key,
+    title VARCHAR(50),
+    publication_year YEAR,
+    author_id INT,
+    foreign key (author_id) references authors(author_id),
+    genre_id int,
+    foreign key (genre_id) references genres(genre_id)
+);
+
+create table users(
+	user_id INT auto_increment primary key,
+    username VARCHAR(50),
+    email varchar(50)
+);
+
+create table borrowed_books(
+	borrow_id int auto_increment primary key,
+    book_id int,
+    foreign key (book_id) references books(book_id),
+    user_id int,
+    foreign key (user_id) references users(user_id),
+    borrow_date date,
+    return_date date
+);
+
+2.
+
+INSERT INTO authors (author_name) VALUES
+('J.K. Rowling'),
+('George Orwell'),
+('Bigsby Jones');
+
+INSERT INTO genres (genre_name) VALUES
+('Fantasy'),
+('Dystopian'),
+('Romance');
+
+INSERT INTO books (title, publication_year, author_id, genre_id) VALUES
+('Harry Potter and the Sorcerer\'s Stone', 1997, 1, 1),
+('1984', 1949, 2, 2),
+('My big romance', 2013, 3, 3);
+
+INSERT INTO users (username, email) VALUES
+('alice', 'alice@example.com'),
+('bob', 'bob@example.com'),
+('carol', 'carol@example.com');
+
+INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES
+(1, 1, '2024-01-10', '2024-01-20'),
+(2, 2, '2024-02-15', '2024-03-01'),
+(3, 3, '2024-03-05', '2024-03-15');
+
+3.
+
+use mydb;
+
+select * from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id;
+
+4.1
+
+select count(o.id) as row_count from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id;
+
+4.2
+
+select count(o.id) as row_count from orders o
+	left join order_details od on o.id = od.order_id
+    right join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    left join shippers sh on sh.id = o.shipper_id
+    left join products p on p.id = od.product_id
+    left join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id;
+
+4.3
+
+select count(o.id) as row_count from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id
+    where e.employee_id > 3 and e.employee_id <= 10;
+
+4.4
+    
+select cat.name, count(cat.name) as count, avg(od.quantity) as avg_qnt  
+from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id
+group by cat.name;
+
+4.5
+
+select cat.name, count(cat.name) as count, avg(od.quantity) as avg_qnt  
+from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id
+group by cat.name
+having avg_qnt > 21;
+
+4.6
+
+select cat.name, count(cat.name) as count, avg(od.quantity) as avg_qnt 
+from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id
+group by cat.name
+having avg_qnt > 21
+order by count desc;
+
+4.7
+
+select cat.name, count(cat.name) as count, avg(od.quantity) as avg_qnt 
+from orders o
+	inner join order_details od on o.id = od.order_id
+    inner join customers c on c.id = o.customer_id
+    inner join employees e on e.employee_id = o.employee_id
+    inner join shippers sh on sh.id = o.shipper_id
+    inner join products p on p.id = od.product_id
+    inner join categories cat on cat.id = p.category_id
+    inner join suppliers sup on sup.id = p.supplier_id
+group by cat.name
+having avg_qnt > 21
+order by count desc
+limit 4 offset 1;
